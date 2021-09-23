@@ -22,9 +22,67 @@ def parse_args():
     return args
 
 
+def get_input_frames(args, bnw=True):
+    '''
+    Get list of (image name, image as a numpy array)
+    Params
+    ------
+    bnw : Bool
+        convert to black and white
+    '''
+    filenames = os.listdir(args.inp_path)
+    inp_frames = []
+    for i, filename in enumerate(filenames):
+        img = cv2.imread(os.path.join(args.inp_path, filename))
+        if bnw:
+            img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+        inp_frames.append((filename, img))
+        print(i)
+    inp_frames = sorted(inp_frames, key=lambda x : x[0])
+    return inp_frames
+
+def get_eval_indices(args):
+    '''
+    Get start and end index as given in eval_frames
+    '''
+    s, e = 0, 0
+    with open(args.eval_frames, 'r') as f:
+        s, e = map(int, f.readline().split())
+    return s, e
+
+def write_output_frames(args, out_frames):
+    '''
+    Write output frames to file
+    '''
+    if not os.path.isdir(args.out_path):
+        os.mkdir(args.out_path)
+
+    for filename, img in out_frames:
+        filename = 'gt' + filename[2:-3] + 'png'
+        cv2.imwrite(os.path.join(args.out_path, filename), img)
+
 def baseline_bgs(args):
-    #TODO complete this function
-    pass
+    inp_frames = get_input_frames(args)
+
+    # Get mean at each pixel
+    mean = inp_frames[0][1].astype(float)
+    num_frames = len(inp_frames)
+    for i in range(1, num_frames):
+        mean = np.add(mean, inp_frames[i][1])
+    mean = mean / num_frames
+    mean = mean.astype(int)
+
+    s, e = get_eval_indices(args)
+
+    k = 40 # threshold
+    out_frames = []
+    # Declare foreground if I - mean <= k
+    for i in range(s-1, e):
+        filename, img = inp_frames[i]
+        img = (np.abs(img - mean) >= k) * 255
+        out_frames.append((filename, img))
+
+    write_output_frames(args, out_frames)
 
 
 def illumination_bgs(args):

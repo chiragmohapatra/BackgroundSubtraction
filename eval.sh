@@ -1,0 +1,1 @@
+python eval.py --pred_path=../COL780-A1-Data/baseline/preds --gt_path=../COL780-A1-Data/baseline/groundtruth
