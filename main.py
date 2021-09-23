@@ -75,12 +75,17 @@ def baseline_bgs(args):
     s, e = get_eval_indices(args)
 
     k = 40 # threshold
+    kernel = np.ones((5,5),np.uint8)
+    
     out_frames = []
     # Declare foreground if I - mean <= k
     for i in range(s-1, e):
         filename, img = inp_frames[i]
-        img = (np.abs(img - mean) >= k) * 255
-        out_frames.append((filename, img))
+        mask = (np.abs(img - mean) >= k) * 255
+        mask = mask.astype('uint8')
+        mask = cv2.morphologyEx(mask, cv2.MORPH_CLOSE, kernel)
+        mask = cv2.morphologyEx(mask, cv2.MORPH_OPEN, kernel)
+        out_frames.append((filename, mask))
 
     write_output_frames(args, out_frames)
 
