@@ -62,7 +62,7 @@ def median_filter(inp_frames, s, e, medianOverAll=True):
 def gmm(inp_frames, s, e):
     fgbg = cv2.createBackgroundSubtractorMOG2(detectShadows = False)
 
-    for i in range(s):
+    for i in range(s-1):
         fgbg.apply(inp_frames[i][1])
     out_frames = []
     for i in range(s-1,e):

@@ -72,8 +72,13 @@ def baseline_bgs(args):
 
 
 def illumination_bgs(args):
-    #TODO complete this function
-    pass
+    inp_frames = get_input_frames(args, bnw=False)
+    s, e = get_eval_indices(args)
+
+    masks = baseline.gmm(inp_frames, s, e)
+    masks = baseline.post_process(masks, kernel_dim=9)
+
+    write_output_frames(args, masks)
 
 
 def jitter_bgs(args):
