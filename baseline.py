@@ -12,9 +12,10 @@ def post_process(masks, kernel_dim=5):
     return new_masks
 
 
-def mean_filter(inp_frames, s, e, meanOverAll=True):
+def mean_filter(inp_frames, s, e, meanOverAll=True, k=40):
     # Get mean at each pixel
     mean = inp_frames[0][1].astype(float)
+        
     num_frames = len(inp_frames)
     if not meanOverAll:
         num_frames = s-1
@@ -22,20 +23,18 @@ def mean_filter(inp_frames, s, e, meanOverAll=True):
         mean = np.add(mean, inp_frames[i][1])
     mean = mean / num_frames
     mean = mean.astype(int)
-
-    k = 40 # threshold
     
     out_frames = []
     # Declare foreground if I - mean <= k
     for i in range(s-1, e):
-        filename, img = inp_frames[i]
+        filename , img = inp_frames[i]
         mask = (np.abs(img - mean) >= k) * 255
         out_frames.append((filename, mask))
 
     return out_frames
 
 
-def median_filter(inp_frames, s, e, medianOverAll=True):
+def median_filter(inp_frames, s, e, medianOverAll=True, k=40):
     # Get median at each pixel
     nrows, ncols = inp_frames[0][1].shape
     num_frames = len(inp_frames)
@@ -47,13 +46,11 @@ def median_filter(inp_frames, s, e, medianOverAll=True):
         all_inp[i,:,:] = inp_frames[i][1]
     median = np.median(all_inp, axis=0)
     median = median.astype(int)
-
-    k = 40 # threshold
     
     out_frames = []
     # Declare foreground if I - mean <= k
     for i in range(s-1, e):
-        filename, img = inp_frames[i]
+        filename , img = inp_frames[i]
         mask = (np.abs(img - median) >= k) * 255
         out_frames.append((filename, mask))
 
@@ -64,13 +61,13 @@ def gmm(inp_frames, s, e):
 
     for i in range(s-1):
         fgbg.apply(inp_frames[i][1])
+
     out_frames = []
     for i in range(s-1,e):
         mask = fgbg.apply(inp_frames[i][1])
         out_frames.append((inp_frames[i][0], mask))
         
     return out_frames
-
 
 def convolve2D(image, kernel, padding=0, strides=1):
     # Cross Correlation

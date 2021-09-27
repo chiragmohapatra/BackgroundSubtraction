@@ -2,7 +2,9 @@
 You need to complete the required functions. You may create addition source files and use them by importing here.
 """
 
+from illumination import blur_image, light_consistent_image, equalizeHist, normalise_pixel_vals, resize_frames
 import os
+from vibe import get_vibe_masks
 import cv2
 import argparse
 import numpy as np
@@ -70,13 +72,15 @@ def baseline_bgs(args):
 
     write_output_frames(args, masks)
 
-
 def illumination_bgs(args):
-    inp_frames = get_input_frames(args, bnw=False)
+    inp_frames = get_input_frames(args , True)
     s, e = get_eval_indices(args)
 
+    inp_frames = light_consistent_image(inp_frames)
+    inp_frames = blur_image(inp_frames , kernel_dim=5)
+
     masks = baseline.gmm(inp_frames, s, e)
-    masks = baseline.post_process(masks, kernel_dim=9)
+    masks = baseline.post_process(masks)
 
     write_output_frames(args, masks)
 
@@ -87,8 +91,15 @@ def jitter_bgs(args):
 
 
 def dynamic_bgs(args):
-    #TODO complete this function
-    pass
+    inp_frames = get_input_frames(args)
+    s, e = get_eval_indices(args)
+
+    inp_frames = blur_image(inp_frames , kernel_dim=3)
+
+    masks = baseline.median_filter(inp_frames, s, e, True, k=50)
+    masks = baseline.post_process(masks)
+
+    write_output_frames(args, masks)
 
 
 def ptz_bgs(args):
@@ -97,7 +108,7 @@ def ptz_bgs(args):
 
 
 def main(args):
-    if args.category not in "bijdp":
+    if args.category not in "bijdmp":
         raise ValueError("category should be one of b/i/j/m/p - Found: %s"%args.category)
     FUNCTION_MAPPER = {
             "b": baseline_bgs,

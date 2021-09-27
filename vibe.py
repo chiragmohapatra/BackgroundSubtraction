@@ -93,11 +93,11 @@ class Vibe:
         mask, self.samples = update_step(frame, self.samples, self.min_count, self.N, self.Radius, self.Phi)
         return mask
 
-def get_vibe_masks(inp_frames, s, e):
+def get_vibe_masks(inp_frames,start,s,e):
     vibe = Vibe()
     vibe.init(inp_frames[0][1].astype(np.int32))
 
-    for i in range(1,s-1):
+    for i in range(start,s-1):
         if i % 10 == 0:
             print(i)
         vibe.test_and_update(inp_frames[i][1].astype(np.int32))
