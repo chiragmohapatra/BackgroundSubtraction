@@ -6,7 +6,7 @@ import os
 import cv2
 import argparse
 import numpy as np
-
+import baseline
 
 def parse_args():
     parser = argparse.ArgumentParser(description='Get mIOU of video sequences')
@@ -63,36 +63,22 @@ def write_output_frames(args, out_frames):
 
 def baseline_bgs(args):
     inp_frames = get_input_frames(args)
-
-    # Get mean at each pixel
-    mean = inp_frames[0][1].astype(float)
-    num_frames = len(inp_frames)
-    for i in range(1, num_frames):
-        mean = np.add(mean, inp_frames[i][1])
-    mean = mean / num_frames
-    mean = mean.astype(int)
-
     s, e = get_eval_indices(args)
 
-    k = 40 # threshold
-    kernel = np.ones((5,5),np.uint8)
-    
-    out_frames = []
-    # Declare foreground if I - mean <= k
-    for i in range(s-1, e):
-        filename, img = inp_frames[i]
-        mask = (np.abs(img - mean) >= k) * 255
-        mask = mask.astype('uint8')
-        mask = cv2.morphologyEx(mask, cv2.MORPH_CLOSE, kernel)
-        mask = cv2.morphologyEx(mask, cv2.MORPH_OPEN, kernel)
-        out_frames.append((filename, mask))
+    masks = baseline.median_filter(inp_frames, s, e, True)
+    masks = baseline.post_process(masks)
 
-    write_output_frames(args, out_frames)
+    write_output_frames(args, masks)
 
 
 def illumination_bgs(args):
-    #TODO complete this function
-    pass
+    inp_frames = get_input_frames(args, bnw=False)
+    s, e = get_eval_indices(args)
+
+    masks = baseline.gmm(inp_frames, s, e)
+    masks = baseline.post_process(masks, kernel_dim=9)
+
+    write_output_frames(args, masks)
 
 
 def jitter_bgs(args):
