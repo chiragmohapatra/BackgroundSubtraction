@@ -21,6 +21,13 @@ def blur_image(inp_frames, kernel_dim=5):
         new_frames.append((filename, cv2.GaussianBlur(img,(kernel_dim,kernel_dim),0)))
     return new_frames
 
+def div_image(inp_frames):
+    new_frames = []
+    for filename, img in inp_frames:
+        smooth = cv2.GaussianBlur(img,(9,9),0)
+        new_frames.append((filename, cv2.divide(img,smooth,scale=192)))
+    return new_frames
+
 def apply_clahe(inp_frames):
     new_frames = []
     for filename, img in inp_frames:
@@ -36,4 +43,14 @@ def apply_clahe(inp_frames):
         final = cv2.cvtColor(limg, cv2.COLOR_LAB2BGR)
         new_frames.append((filename,final))
     return new_frames
-    
+
+def resize_frames(inp_frames,height,width):
+    new_frames = []
+    for filename, img in inp_frames:
+        if(len(img.shape) == 2):
+            new_img_shape = (320,240)
+        else:
+            new_img_shape = (320,240,3)
+        new_frames.append((filename, cv2.resize(img , new_img_shape)))
+    return new_frames
+

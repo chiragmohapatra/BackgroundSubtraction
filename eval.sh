@@ -1,1 +1,1 @@
-python eval.py --pred_path=../COL780-A1-Data/illumination/preds --gt_path=../COL780-A1-Data/illumination/groundtruth
+python eval.py --pred_path=../COL780-A1-Data/baseline/preds --gt_path=../COL780-A1-Data/baseline/groundtruth

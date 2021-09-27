@@ -2,7 +2,8 @@ import cv2
 import numpy as np
 
 def post_process(masks, kernel_dim=5):
-    kernel = np.ones((kernel_dim,kernel_dim),np.uint8)
+    #kernel = np.ones((kernel_dim,kernel_dim),np.uint8)
+    kernel = cv2.getStructuringElement(shape=cv2.MORPH_RECT, ksize=(kernel_dim,kernel_dim))
     new_masks = []
     for filename, mask in masks:
         mask = mask.astype('uint8')
@@ -68,7 +69,6 @@ def gmm(inp_frames, s, e):
         out_frames.append((inp_frames[i][0], mask))
         
     return out_frames
-
 
 def convolve2D(image, kernel, padding=0, strides=1):
     # Cross Correlation

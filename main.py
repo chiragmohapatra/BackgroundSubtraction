@@ -2,7 +2,7 @@
 You need to complete the required functions. You may create addition source files and use them by importing here.
 """
 
-from illumination import blur_image, equalizeHist
+from illumination import blur_image, div_image, equalizeHist, normalise_pixel_vals, resize_frames
 import os
 from vibe import get_vibe_masks
 import cv2
@@ -72,12 +72,12 @@ def baseline_bgs(args):
 
     write_output_frames(args, masks)
 
-
 def illumination_bgs(args):
     inp_frames = get_input_frames(args , True)
     s, e = get_eval_indices(args)
 
-    inp_frames = blur_image(inp_frames , kernel_dim=3)
+    inp_frames = div_image(inp_frames)
+    inp_frames = blur_image(inp_frames , kernel_dim=5)
 
     masks = baseline.gmm(inp_frames, s, e)
     masks = baseline.post_process(masks)
@@ -107,7 +107,6 @@ def dynamic_bgs(args):
     masks = baseline.post_process(masks)
 
     write_output_frames(args, masks)
-    pass
 
 
 def ptz_bgs(args):
