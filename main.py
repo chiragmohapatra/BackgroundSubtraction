@@ -9,6 +9,7 @@ import cv2
 import argparse
 import numpy as np
 import baseline
+import jitter
 
 def parse_args():
     parser = argparse.ArgumentParser(description='Get mIOU of video sequences')
@@ -22,7 +23,6 @@ def parse_args():
                                                         help="Path to the eval_frames.txt file")
     args = parser.parse_args()
     return args
-
 
 def get_input_frames(args, bnw=True):
     '''
@@ -84,11 +84,19 @@ def illumination_bgs(args):
 
     write_output_frames(args, masks)
 
-
 def jitter_bgs(args):
-    #TODO complete this function
-    pass
+    inp_frames = get_input_frames(args, bnw=False)
+    s, e = get_eval_indices(args)
 
+    out_frames, inv_transforms = jitter.adjust_jitter(inp_frames)
+
+    masks = baseline.gmm(out_frames, s-1, e-1, detectShadows=True)
+    masks = baseline.post_process(masks, kernel_dim=7)
+    inv_transforms = inv_transforms[s-2:]
+
+    masks = jitter.correct_masks(masks, inv_transforms)
+
+    write_output_frames(args, masks)
 
 def dynamic_bgs(args):
     inp_frames = get_input_frames(args)
@@ -101,11 +109,9 @@ def dynamic_bgs(args):
 
     write_output_frames(args, masks)
 
-
 def ptz_bgs(args):
     #TODO: (Optional) complete this function
     pass
-
 
 def main(args):
     if args.category not in "bijdmp":
