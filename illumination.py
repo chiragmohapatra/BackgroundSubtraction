@@ -21,7 +21,8 @@ def blur_image(inp_frames, kernel_dim=5):
         new_frames.append((filename, cv2.GaussianBlur(img,(kernel_dim,kernel_dim),0)))
     return new_frames
 
-def div_image(inp_frames):
+# makes the images light consistent
+def light_consistent_image(inp_frames):
     new_frames = []
     for filename, img in inp_frames:
         smooth = cv2.GaussianBlur(img,(9,9),0)

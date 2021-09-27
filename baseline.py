@@ -2,8 +2,7 @@ import cv2
 import numpy as np
 
 def post_process(masks, kernel_dim=5):
-    #kernel = np.ones((kernel_dim,kernel_dim),np.uint8)
-    kernel = cv2.getStructuringElement(shape=cv2.MORPH_RECT, ksize=(kernel_dim,kernel_dim))
+    kernel = np.ones((kernel_dim,kernel_dim),np.uint8)
     new_masks = []
     for filename, mask in masks:
         mask = mask.astype('uint8')
