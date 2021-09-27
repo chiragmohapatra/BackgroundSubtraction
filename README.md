@@ -12,6 +12,7 @@ This repository is for the first assignment of COL780 - Computer Vision.
 - https://docs.opencv.org/3.3.1/d7/d8b/tutorial_py_lucas_kanade.html
 - https://github.com/felixchenfy/test_background_subtraction
 - https://stackoverflow.com/questions/48697667/how-to-combine-background-subtraction-with-dense-optical-flow-tracking-in-opencv
+- https://github.com/spmallick/learnopencv/tree/master/VideoStabilization
 
 
 ## Experiments
@@ -30,6 +31,15 @@ This repository is for the first assignment of COL780 - Computer Vision.
 - **Main challenge : remove effect of moving clouds**
     - no improvement on adding gaussian blur to input
     - no improvement on applying CLAHE
+
+# Jitter
+- Applying GMM to transformed frames : 0.4419
+- After smoothing with
+    - 3x3 kernel : 0.5164
+    - 5x5 kernel : 0.5247
+    - 7x7 kernel : 0.5208
+- After applying correction : 0.63 (7x7 kernel)
+
 
 
 

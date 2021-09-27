@@ -7,6 +7,7 @@ import cv2
 import argparse
 import numpy as np
 import baseline
+import jitter
 
 def parse_args():
     parser = argparse.ArgumentParser(description='Get mIOU of video sequences')
@@ -82,8 +83,18 @@ def illumination_bgs(args):
 
 
 def jitter_bgs(args):
-    #TODO complete this function
-    pass
+    inp_frames = get_input_frames(args, bnw=False)
+    s, e = get_eval_indices(args)
+
+    out_frames, inv_transforms = jitter.adjust_jitter(inp_frames)
+
+    masks = baseline.gmm(out_frames, s, e)
+    masks = baseline.post_process(masks, kernel_dim=7)
+    inv_transforms = inv_transforms[s-2:]
+
+    masks = jitter.correct_masks(masks, inv_transforms)
+
+    write_output_frames(args, masks)
 
 
 def dynamic_bgs(args):
